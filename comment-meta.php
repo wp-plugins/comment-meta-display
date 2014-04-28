@@ -5,7 +5,7 @@ Plugin Name: Comment Meta Display
 Plugin URI: http://wordpress.org/extend/plugins/comment-meta-display/
 Description: Adds a box to the edit comments page which shows the Comment Meta.
 Author: SparkWeb Interactive, Inc.
-Version: 1.0
+Version: 1.1
 Author URI: http://www.soapboxdave.com/
 
 **************************************************************************
@@ -35,78 +35,39 @@ function cme_admin_init() {
 		}
 	}
 }
-add_action('admin_init', 'cme_admin_init');
+add_action('admin_init', 'cme_admin_init', 99);
 
 function cme_comment_meta_box($comment) {
 	global $wpdb;
 	$comment_id = $comment->comment_ID;
 
-	?>
-	<div id="postcustomstuff">
-	<div id="ajax-response"></div>
-	<?php
-
+	echo '<div class="cme-details" style="margin: 13px;">';
 
 	$comment_meta = $wpdb->get_results("SELECT * FROM $wpdb->commentmeta WHERE comment_id = $comment_id", ARRAY_A);
-	$update_nonce = "";
 	if ($comment_meta) :
-		?>
-		<table id="list-table">
-			<thead>
-			<tr>
-				<th class="left"><?php _ex( 'Name', 'meta name' ) ?></th>
-				<th><?php _e( 'Value' ) ?></th>
-			</tr>
-			</thead>
-			<tbody id='the-list' class='list:meta'>
-		<?php
-
-		$count = 0;
 		foreach ($comment_meta as $entry) :
-
-			if ( !$update_nonce )
-				$update_nonce = wp_create_nonce( 'add-meta' );
-
-			$r = '';
-			++ $count;
-			if ( $count % 2 )
-				$style = 'alternate';
-			else
-				$style = '';
-			if ('_' == $entry['meta_key'] { 0 } )
-				$style .= ' hidden';
 
 			if ( is_serialized( $entry['meta_value'] ) ) {
 				if ( is_serialized_string( $entry['meta_value'] ) ) {
-					// this is a serialized string, so we should display it
 					$entry['meta_value'] = maybe_unserialize( $entry['meta_value'] );
 				} else {
-					// this is a serialized array/object so we should NOT display it
-					--$count;
-					return;
+					$entry['meta_value'] = "SERIALIZED DATA";
 				}
 			}
 
 			$entry['meta_key'] = esc_attr($entry['meta_key']);
-			$entry['meta_value'] = esc_textarea( $entry['meta_value'] ); // using a <textarea />
+			$entry['meta_value'] = $entry['meta_value'];
 			$entry['meta_id'] = (int) $entry['meta_id'];
 
-			$delete_nonce = wp_create_nonce( 'delete-meta_' . $entry['meta_id'] );
-
-			echo "\n\t<tr id='meta-{$entry['meta_id']}' class='$style'>";
-			echo "\n\t\t<td class='left'><label class='screen-reader-text' for='meta[{$entry['meta_id']}][key]'>" . __( 'Key' ) . "</label><input name='meta[{$entry['meta_id']}][key]' id='meta[{$entry['meta_id']}][key]' tabindex='6' type='text' size='20' value='" . $entry['meta_key'] . "' />";
-
-			echo "</td>";
-
-			echo "\n\t\t<td><label class='screen-reader-text' for='meta[{$entry['meta_id']}][value]'>" . __( 'Value' ) . "</label><textarea name='meta[{$entry['meta_id']}][value]' id='meta[{$entry['meta_id']}][value]' tabindex='6' rows='2' cols='30'>{$entry['meta_value']}</textarea></td>\n\t</tr>";
+			echo "<div style=\"overflow: auto; clear: both;\">\n";
+			echo "<span style=\"float: left; width: 25%;\">" . $entry['meta_key'] . "</span>";
+			echo "<span style=\"float: left; width: 70%;\">" . $entry['meta_value'] . "</span>\n";
+			echo "</div>" . "\n";
 
 
 		endforeach;
+		echo '<div style="clear:both"></div>' . "\n\n";
 
-		?>
-			</tbody>
-		</table>
-		<?php
 	else :
 	?>
 	<script type="text/javascript">
@@ -118,11 +79,6 @@ function cme_comment_meta_box($comment) {
 	endif;
 	?>
 
-
-
-
-
-
 </div>
 
 	<?php
@@ -130,5 +86,3 @@ function cme_comment_meta_box($comment) {
 
 
 }
-
-?>
