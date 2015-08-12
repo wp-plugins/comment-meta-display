@@ -3,7 +3,7 @@ Contributors: sparkweb
 Donate link: http://wordpress.org/extend/plugins/comment-meta-display/
 Tags: comments, meta, custom fields
 Requires at least: 2.9
-Tested up to: 4.1
+Tested up to: 4.3
 Stable tag: 1.1
 View comment meta beneath the comment on the admin edit screen.
 
